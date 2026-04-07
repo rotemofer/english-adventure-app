@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>English Adventure 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ─── TOKENS ──────────────────────────────────────────────────────────── */
+:root {
+  --bg:      #0F1923;
+  --surface: #1A2535;
+  --card:    #202F42;
+  --border:  #2E4260;
+  --yellow:  #FFD166;
+  --coral:   #EF476F;
+  --green:   #06D6A0;
+  --blue:    #4CC9F0;
+  --purple:  #9B5DE5;
+  --orange:  #FF6B35;
+  --text:    #EEF2FF;
+  --muted:   #7A93B4;
+  --shadow:  0 8px 32px rgba(0,0,0,0.35);
+  --r:       22px;
+}
+
+/* ─── RESET ───────────────────────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+font-family:‘Nunito’,sans-serif;
+background:var(–bg);
+color:var(–text);
+min-height:100vh;
+display:flex;
+flex-direction:column;
+align-items:center;
+padding:20px 16px 60px;
+overflow-x:hidden;
+}
+
+/* animated starfield */
+body::before{
+content:’’;
+position:fixed;inset:0;
+background:
+radial-gradient(circle at 20% 30%, rgba(76,201,240,0.06) 0%, transparent 50%),
+radial-gradient(circle at 80% 70%, rgba(155,93,229,0.06) 0%, transparent 50%);
+pointer-events:none;z-index:0;
+}
+
+/* ─── HEADER ──────────────────────────────────────────────────────────── */
+header{
+position:relative;z-index:1;
+text-align:center;
+margin-bottom:16px;
+width:100%;max-width:560px;
+}
+.logo{
+font-family:‘Fredoka One’,cursive;
+font-size:2.2rem;
+background:linear-gradient(135deg,var(–yellow),var(–coral));
+-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+background-clip:text;
+filter:drop-shadow(0 2px 8px rgba(239,71,111,0.3));
+}
+.tagline{font-size:0.8rem;color:var(–muted);margin-top:2px;direction:rtl;}
+
+/* ─── LEVEL TABS ──────────────────────────────────────────────────────── */
+.tabs{
+display:flex;gap:10px;
+position:relative;z-index:1;
+margin-bottom:20px;
+}
+.tab{
+flex:1;
+padding:10px 0;
+border:2px solid var(–border);
+border-radius:50px;
+font-family:‘Fredoka One’,cursive;
+font-size:0.95rem;
+cursor:pointer;
+background:var(–surface);
+color:var(–muted);
+transition:all .2s;
+position:relative;
+overflow:hidden;
+}
+.tab.active{
+border-color:var(–yellow);
+color:var(–yellow);
+background:rgba(255,209,102,0.08);
+}
+.tab .lock{font-size:0.75rem;margin-left:4px;}
+.tab.locked{cursor:not-allowed;opacity:.5;}
+
+/* ─── SRS STATUS BAR ──────────────────────────────────────────────────── */
+.srs-bar{
+width:100%;max-width:560px;
+position:relative;z-index:1;
+background:var(–surface);
+border:1px solid var(–border);
+border-radius:var(–r);
+padding:12px 18px;
+display:flex;gap:16px;align-items:center;
+margin-bottom:18px;
+font-size:0.8rem;
+color:var(–muted);
+}
+.srs-pill{
+display:flex;align-items:center;gap:5px;
+background:var(–card);
+border-radius:20px;
+padding:4px 12px;
+font-weight:700;font-size:0.78rem;
+}
+.srs-pill .dot{width:8px;height:8px;border-radius:50%;}
+.dot-new{background:var(–blue);}
+.dot-review{background:var(–yellow);}
+.dot-mastered{background:var(–green);}
+
+/* ─── MAIN CARD ───────────────────────────────────────────────────────── */
+.game-card{
+position:relative;z-index:1;
+background:var(–card);
+border:1px solid var(–border);
+border-radius:28px;
+box-shadow:var(–shadow);
+width:100%;max-width:560px;
+padding:28px 24px 26px;
+display:flex;flex-direction:column;align-items:center;gap:20px;
+}
+
+/* round info */
+.round-row{
+display:flex;justify-content:space-between;align-items:center;
+width:100%;
+font-size:0.78rem;color:var(–muted);font-weight:700;
+}
+.review-badge{
+background:rgba(255,209,102,0.15);
+border:1px solid rgba(255,209,102,0.35);
+color:var(–yellow);
+border-radius:20px;padding:3px 10px;
+font-size:0.72rem;font-weight:800;
+display:none;
+}
+.review-badge.show{display:inline-block;}
+
+/* image circle */
+.img-circle{
+width:170px;height:170px;border-radius:50%;
+background:linear-gradient(135deg,#1e3a5f,#2a4a7a);
+border:3px solid var(–border);
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;
+transition:transform .18s,border-color .2s;
+position:relative;flex-shrink:0;
+user-select:none;
+}
+.img-circle:hover{transform:scale(1.04);border-color:var(–blue);}
+.img-circle:active{transform:scale(0.97);}
+.word-emoji{font-size:6rem;line-height:1;transition:transform .25s cubic-bezier(.34,1.56,.64,1);}
+.img-circle:hover .word-emoji{transform:scale(1.1) rotate(-5deg);}
+.speaker-badge{
+position:absolute;bottom:4px;right:4px;
+background:var(–blue);color:#000;
+width:34px;height:34px;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+font-size:1rem;box-shadow:0 3px 10px rgba(76,201,240,0.4);
+transition:transform .2s, background .2s, box-shadow .2s;
+}
+.img-circle:hover .speaker-badge{transform:scale(1.15);}
+
+/* word reveal */
+.word-reveal{
+font-family:‘Fredoka One’,cursive;
+font-size:2rem;letter-spacing:3px;
+color:var(–blue);min-height:2.4rem;
+text-align:center;opacity:0;
+transition:opacity .3s;
+}
+.word-reveal.show{opacity:1;}
+.word-reveal .hl{color:var(–coral);}
+.heb-label{font-size:0.82rem;color:var(–muted);direction:rtl;min-height:1rem;opacity:0;transition:opacity .3s .1s;}
+.heb-label.show{opacity:1;}
+
+/* prompt */
+.prompt{font-size:0.9rem;font-weight:800;color:#aac;text-align:center;line-height:1.5;}
+.prompt .prompt-he{display:block;font-size:0.78rem;font-weight:700;color:var(–muted);direction:rtl;margin-top:1px;}
+
+/* ─── LEVEL 1: letter choices ─────────────────────────────────────────── */
+#l1-choices{
+display:grid;grid-template-columns:repeat(4,1fr);gap:10px;width:100%;
+}
+.ltr-btn{
+font-family:‘Fredoka One’,cursive;font-size:1.9rem;
+padding:14px 6px;
+border:2px solid var(–border);border-radius:18px;
+background:var(–surface);color:var(–text);
+cursor:pointer;transition:all .18s;
+box-shadow:0 4px 14px rgba(0,0,0,0.2);
+}
+.ltr-btn:hover:not(:disabled){
+transform:translateY(-4px) scale(1.06);
+border-color:var(–blue);color:var(–blue);
+box-shadow:0 8px 22px rgba(76,201,240,0.2);
+}
+.ltr-btn:disabled{cursor:default;}
+.ltr-btn.correct{background:rgba(6,214,160,0.15);border-color:var(–green);color:var(–green);transform:scale(1.1);animation:bounce .45s cubic-bezier(.34,1.56,.64,1);}
+.ltr-btn.wrong{background:rgba(239,71,111,0.15);border-color:var(–coral);color:var(–coral);animation:shake .4s;}
+.ltr-btn.show-correct{background:rgba(6,214,160,0.1);border-color:var(–green);color:var(–green);}
+
+/* ─── LEVEL 2: spell tiles ────────────────────────────────────────────── */
+#l2-section{display:none;width:100%;}
+.answer-slots{
+display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+min-height:62px;margin-bottom:4px;
+}
+.slot{
+width:52px;height:58px;
+border-radius:14px;
+border:2px dashed var(–border);
+background:var(–surface);
+display:flex;align-items:center;justify-content:center;
+font-family:‘Fredoka One’,cursive;font-size:1.6rem;
+color:var(–text);
+cursor:pointer;
+transition:all .18s;
+position:relative;
+}
+.slot.filled{
+border-style:solid;border-color:var(–blue);
+background:rgba(76,201,240,0.08);
+cursor:pointer;
+}
+.slot.filled:hover{border-color:var(–coral);background:rgba(239,71,111,0.08);}
+.slot.correct-slot{border-color:var(–green);background:rgba(6,214,160,0.12);animation:bounce .4s cubic-bezier(.34,1.56,.64,1);}
+.slot.wrong-slot{border-color:var(–coral);background:rgba(239,71,111,0.12);animation:shake .4s;}
+
+.tile-pool{
+display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+min-height:58px;
+}
+.tile{
+width:52px;height:58px;
+border-radius:14px;
+border:2px solid var(–border);
+background:var(–surface);
+display:flex;align-items:center;justify-content:center;
+font-family:‘Fredoka One’,cursive;font-size:1.6rem;
+color:var(–text);
+cursor:pointer;
+transition:all .18s;
+box-shadow:0 4px 14px rgba(0,0,0,0.2);
+}
+.tile:hover{transform:translateY(-4px) scale(1.08);border-color:var(–yellow);color:var(–yellow);box-shadow:0 8px 18px rgba(255,209,102,0.15);}
+.tile.used{opacity:0;pointer-events:none;}
+.tile.correct-tile{border-color:var(–green);background:rgba(6,214,160,0.12);color:var(–green);}
+.tile.wrong-tile{border-color:var(–coral);background:rgba(239,71,111,0.12);color:var(–coral);}
+
+.hint-row{display:flex;gap:10px;justify-content:center;margin-top:2px;}
+.hint-btn{
+padding:7px 20px;
+border:1px solid var(–border);border-radius:20px;
+background:var(–surface);color:var(–muted);
+font-family:‘Nunito’,sans-serif;font-weight:700;font-size:0.78rem;
+cursor:pointer;transition:all .15s;
+}
+.hint-btn:hover{border-color:var(–yellow);color:var(–yellow);}
+
+/* ─── SHARED FEEDBACK ─────────────────────────────────────────────────── */
+.feedback{
+font-family:‘Fredoka One’,cursive;font-size:1.35rem;
+min-height:1.8rem;text-align:center;transition:all .25s;
+}
+.feedback.good{color:var(–green);}
+.feedback.bad{color:var(–coral);}
+
+/* next button */
+.next-btn{
+padding:13px 44px;border:none;border-radius:50px;
+font-family:‘Fredoka One’,cursive;font-size:1.1rem;
+cursor:pointer;color:#0F1923;
+background:linear-gradient(135deg,var(–yellow),var(–orange));
+box-shadow:0 6px 20px rgba(255,209,102,0.25);
+transition:transform .18s;display:none;
+}
+.next-btn.show{display:block;animation:popIn .3s cubic-bezier(.34,1.56,.64,1);}
+.next-btn:hover{transform:scale(1.06);}
+
+/* ─── PROGRESS DOTS ───────────────────────────────────────────────────── */
+.progress-row{
+display:flex;gap:7px;flex-wrap:wrap;justify-content:center;
+position:relative;z-index:1;
+width:100%;max-width:560px;
+margin-bottom:4px;
+}
+.pdot{
+width:13px;height:13px;border-radius:50%;
+background:var(–border);
+transition:background .3s,transform .3s;
+}
+.pdot.done-ok{background:var(–green);}
+.pdot.done-fail{background:var(–coral);}
+.pdot.current{background:var(–yellow);transform:scale(1.4);}
+
+/* ─── RESULT SCREEN ───────────────────────────────────────────────────── */
+#result-screen{
+display:none;position:relative;z-index:1;
+background:var(–card);border:1px solid var(–border);
+border-radius:28px;box-shadow:var(–shadow);
+width:100%;max-width:560px;
+padding:44px 24px;
+text-align:center;flex-direction:column;align-items:center;gap:14px;
+animation:popIn .4s cubic-bezier(.34,1.56,.64,1);
+}
+#result-screen.show{display:flex;}
+.res-trophy{font-size:4.5rem;}
+.res-title{font-family:‘Fredoka One’,cursive;font-size:2rem;color:var(–yellow);}
+.res-score{font-size:0.95rem;color:var(–muted);}
+.res-score span{color:var(–text);font-size:1.2rem;font-weight:800;}
+.srs-summary{
+background:var(–surface);border:1px solid var(–border);
+border-radius:var(–r);padding:14px 18px;width:100%;
+font-size:0.82rem;color:var(–muted);line-height:1.8;text-align:left;
+}
+.srs-summary b{color:var(–text);}
+.replay-btn{
+padding:13px 44px;border:none;border-radius:50px;
+font-family:‘Fredoka One’,cursive;font-size:1.1rem;
+cursor:pointer;color:#0F1923;
+background:linear-gradient(135deg,var(–blue),var(–purple));
+box-shadow:0 6px 20px rgba(76,201,240,0.25);
+transition:transform .18s;
+}
+.replay-btn:hover{transform:scale(1.05);}
+
+/* ─── ANIMATIONS ──────────────────────────────────────────────────────── */
+@keyframes bounce{0%{transform:scale(1)}50%{transform:scale(1.22)}100%{transform:scale(1.1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes slotIn{from{transform:scale(0) rotate(-15deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+/* confetti */
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:999;overflow:hidden;}
+.cc{position:absolute;border-radius:2px;animation:cfall linear forwards;}
+@keyframes cfall{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(600deg);opacity:0}}
+</style>
+
+</head>
+<body>
+<div class="confetti-wrap" id="confetti"></div>
+
+<header>
+  <div class="logo">🌟 English Adventure</div>
+  <div class="tagline">הרפתקת אנגלית — שני רמות, מילים חכמות</div>
+  <button id="dev-btn" onclick="devUnlock()" style="
+    margin-top:6px;
+    padding:4px 14px;border:1px dashed #2E4260;border-radius:20px;
+    background:transparent;color:#2E4260;
+    font-family:'Nunito',sans-serif;font-size:0.7rem;font-weight:700;
+    cursor:pointer;transition:all .2s;
+  ">🛠 dev</button>
+</header>
+
+<!-- Level tabs -->
+
+<div class="tabs" style="width:100%;max-width:560px;position:relative;z-index:1;">
+  <button class="tab active" id="tab-l1" onclick="switchLevel(1)">🔤 Level 1<br><small>First Letter</small></button>
+  <button class="tab" id="tab-l2" onclick="switchLevel(2)">✏️ Level 2<br><small>Spell It!</small></button>
+</div>
+
+<!-- SRS status -->
+
+<div class="srs-bar" id="srs-bar">
+  <span style="font-weight:800;color:var(--text);font-size:0.85rem;">📚 Word Bank</span>
+  <div class="srs-pill"><div class="dot dot-new"></div><span id="cnt-new">0</span> new</div>
+  <div class="srs-pill"><div class="dot dot-review"></div><span id="cnt-review">0</span> review</div>
+  <div class="srs-pill"><div class="dot dot-mastered"></div><span id="cnt-mastered">0</span> mastered</div>
+</div>
+
+<!-- Progress dots -->
+
+<div class="progress-row" id="progress-row"></div>
+
+<!-- Game card -->
+
+<div class="game-card" id="game-card">
+  <div class="round-row">
+    <span id="round-label">Round 1 / 10</span>
+    <span class="review-badge" id="review-badge">🔄 Review word</span>
+  </div>
+
+  <div class="img-circle" id="img-circle" title="Tap to hear">
+    <div class="word-emoji" id="word-emoji">🐄</div>
+    <div class="speaker-badge">🔊</div>
+  </div>
+
+  <div>
+    <div class="word-reveal" id="word-reveal"></div>
+    <div class="heb-label" id="heb-label"></div>
+  </div>
+
+  <div class="prompt" id="prompt">Which letter does this word start with? 🤔</div>
+
+  <!-- L1: letter buttons -->
+
+  <div id="l1-choices"></div>
+
+  <!-- L2: spelling tiles -->
+
+  <div id="l2-section">
+    <div class="answer-slots" id="answer-slots"></div>
+    <div style="height:10px"></div>
+    <div class="tile-pool" id="tile-pool"></div>
+    <div class="hint-row">
+      <button class="hint-btn" id="hint-btn" onclick="useHint()">💡 Hint</button>
+      <button class="hint-btn" id="clear-btn" onclick="clearSlots()">✖ Clear</button>
+    </div>
+  </div>
+
+  <div class="feedback" id="feedback"></div>
+  <button class="next-btn" id="next-btn" onclick="nextRound()">Next ➡️</button>
+</div>
+
+<!-- Result screen -->
+
+<div id="result-screen">
+  <div class="res-trophy" id="res-trophy">🏆</div>
+  <div class="res-title" id="res-title">Great job!</div>
+  <div class="res-score" id="res-score"></div>
+  <div class="srs-summary" id="srs-summary"></div>
+  <button class="replay-btn" onclick="startSession()">Play Again 🔄</button>
+</div>
+
+<!-- Lock modal -->
+
+<div id="lock-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.65);align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#202F42;border:2px solid #FFD166;border-radius:28px;padding:32px 24px;max-width:320px;width:100%;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:10px;">🔒</div>
+    <div style="font-family:'Fredoka One',cursive;font-size:1.3rem;color:#FFD166;margin-bottom:10px;">Level 2 is locked</div>
+    <div style="font-size:0.88rem;color:#7A93B4;line-height:1.6;margin-bottom:22px;">Complete more Level 1 rounds first — or tap below to jump in anyway!</div>
+    <button onclick="document.getElementById('lock-modal').style.display='none'; forceLevel2();" style="display:block;width:100%;margin-bottom:10px;padding:13px;border:none;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;color:#0F1923;background:linear-gradient(135deg,#FFD166,#FF6B35);">Unlock now 🚀</button>
+    <button onclick="document.getElementById('lock-modal').style.display='none';" style="display:block;width:100%;padding:13px;border:1px solid #2E4260;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1rem;cursor:pointer;color:#7A93B4;background:transparent;">Keep playing Level 1</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   WORD BANK
+═══════════════════════════════════════════════════════════════ */
+const WORD_BANK = [
+  {word:'Ant',he:'נמלה',emoji:'🐜'},{word:'Apple',he:'תפוח',emoji:'🍎'},
+  {word:'Bear',he:'דוב',emoji:'🐻'},{word:'Bee',he:'דבורה',emoji:'🐝'},
+  {word:'Bird',he:'ציפור',emoji:'🐦'},{word:'Boat',he:'סירה',emoji:'⛵'},
+  {word:'Bus',he:'אוטובוס',emoji:'🚌'},{word:'Cake',he:'עוגה',emoji:'🎂'},
+  {word:'Car',he:'מכונית',emoji:'🚗'},{word:'Cat',he:'חתול',emoji:'🐱'},
+  {word:'Cow',he:'פרה',emoji:'🐄'},{word:'Dog',he:'כלב',emoji:'🐶'},
+  {word:'Door',he:'דלת',emoji:'🚪'},{word:'Duck',he:'ברווז',emoji:'🦆'},
+  {word:'Egg',he:'ביצה',emoji:'🥚'},{word:'Elephant',he:'פיל',emoji:'🐘'},
+  {word:'Fish',he:'דג',emoji:'🐟'},{word:'Flower',he:'פרח',emoji:'🌸'},
+  {word:'Frog',he:'צפרדע',emoji:'🐸'},{word:'Giraffe',he:'ג\'ירפה',emoji:'🦒'},
+  {word:'Hat',he:'כובע',emoji:'🎩'},{word:'Horse',he:'סוס',emoji:'🐴'},
+  {word:'House',he:'בית',emoji:'🏠'},{word:'Kite',he:'עפיפון',emoji:'🪁'},
+  {word:'Leaf',he:'עלה',emoji:'🍃'},{word:'Lemon',he:'לימון',emoji:'🍋'},
+  {word:'Lion',he:'אריה',emoji:'🦁'},{word:'Milk',he:'חלב',emoji:'🥛'},
+  {word:'Monkey',he:'קוף',emoji:'🐒'},{word:'Moon',he:'ירח',emoji:'🌙'},
+  {word:'Mouse',he:'עכבר',emoji:'🐭'},{word:'Nest',he:'קן',emoji:'🪹'},
+  {word:'Orange',he:'תפוז',emoji:'🍊'},{word:'Owl',he:'ינשוף',emoji:'🦉'},
+  {word:'Penguin',he:'פינגווין',emoji:'🐧'},{word:'Pig',he:'חזיר',emoji:'🐷'},
+  {word:'Pizza',he:'פיצה',emoji:'🍕'},{word:'Rabbit',he:'ארנב',emoji:'🐰'},
+  {word:'Rainbow',he:'קשת',emoji:'🌈'},{word:'Robot',he:'רובוט',emoji:'🤖'},
+  {word:'Rocket',he:'טיל',emoji:'🚀'},{word:'Snake',he:'נחש',emoji:'🐍'},
+  {word:'Star',he:'כוכב',emoji:'⭐'},{word:'Sun',he:'שמש',emoji:'☀️'},
+  {word:'Tiger',he:'נמר',emoji:'🐯'},{word:'Train',he:'רכבת',emoji:'🚂'},
+  {word:'Tree',he:'עץ',emoji:'🌳'},{word:'Umbrella',he:'מטריה',emoji:'☂️'},
+  {word:'Unicorn',he:'חד קרן',emoji:'🦄'},{word:'Whale',he:'לוויתן',emoji:'🐋'},
+  {word:'Wolf',he:'זאב',emoji:'🐺'},{word:'Zebra',he:'זברה',emoji:'🦓'},
+];
+
+const ALPHA = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+/* ═══════════════════════════════════════════════════════════════
+   SPACED REPETITION ENGINE  (Leitner-inspired, simplified)
+
+   Each word has a "card" record:
+   {
+     word: string,
+     level: 0-4        (0=new, 1=seen once, 2=reviewed, 3=strong, 4=mastered)
+     nextDue: number   (session index when it should reappear)
+     streak: number    (consecutive correct answers)
+     failCount: number (total failures)
+   }
+
+   Level  → sessions until next review
+   0 new  → show now
+   1      → show again in 1 session (same session's end, or next)
+   2      → show in 2 sessions
+   3      → show in 4 sessions
+   4      → mastered (still resurfaces occasionally)
+
+   In a 10-round session:
+   - ~7 slots filled from "due" words (new or review)
+   - ~3 slots reserved for failed words from THIS session (instant retry)
+═══════════════════════════════════════════════════════════════ */
+
+let srsDB     = {};   // word -> card
+let sessionN  = 0;    // increments each session
+
+function initSRS() {
+  WORD_BANK.forEach(w => {
+    if (!srsDB[w.word]) {
+      srsDB[w.word] = { word:w.word, level:0, nextDue:0, streak:0, failCount:0 };
+    }
+  });
+}
+
+function getCardStatus(card) {
+  if (card.level === 0) return 'new';
+  if (card.level >= 4)  return 'mastered';
+  return 'review';
+}
+
+function onCorrect(word) {
+  const c = srsDB[word];
+  c.streak++;
+  const intervals = [0, 1, 2, 4, 99];
+  c.level = Math.min(4, c.level + 1);
+  c.nextDue = sessionN + intervals[c.level];
+}
+
+function onWrong(word) {
+  const c = srsDB[word];
+  c.streak = 0;
+  c.failCount++;
+  // drop level but never below 1 (so it stays in active pool)
+  c.level = Math.max(1, c.level - 1);
+  // due immediately (next session)
+  c.nextDue = sessionN;
+}
+
+function getDueWords(count) {
+  // Priority 1: new words (level 0)
+  // Priority 2: review words that are due
+  // Priority 3: mastered words surfaced randomly
+  const now = sessionN;
+
+  const newCards     = WORD_BANK.filter(w => srsDB[w.word].level === 0);
+  const reviewCards  = WORD_BANK.filter(w => {
+    const c = srsDB[w.word];
+    return c.level >= 1 && c.level < 4 && c.nextDue <= now;
+  });
+  const masteredCards = WORD_BANK.filter(w => srsDB[w.word].level === 4);
+
+  let pool = [...shuffle(newCards).slice(0, Math.min(4, count)),
+              ...shuffle(reviewCards).slice(0, count),
+              ...shuffle(masteredCards).slice(0, 2)];
+
+  pool = shuffle(pool);
+
+  // Ensure we always have enough — fill with random if short
+  if (pool.length < count) {
+    const seen = new Set(pool.map(w => w.word));
+    const extra = shuffle(WORD_BANK.filter(w => !seen.has(w.word)));
+    pool = [...pool, ...extra];
+  }
+
+  return pool.slice(0, count);
+}
+
+function getSRSCounts() {
+  let newC=0, reviewC=0, masteredC=0;
+  WORD_BANK.forEach(w => {
+    const s = getCardStatus(srsDB[w.word]);
+    if (s==='new') newC++;
+    else if (s==='review') reviewC++;
+    else masteredC++;
+  });
+  return {newC, reviewC, masteredC};
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GAME STATE
+═══════════════════════════════════════════════════════════════ */
+const ROUNDS = 10;
+let currentLevel = 1;   // 1 or 2
+let queue        = [];   // words for this session
+let round        = 0;
+let score        = 0;
+let answered     = false;
+let failedThisSession = []; // words failed → will be re-injected
+
+// L2 state
+let l2Answer     = [];   // letters placed so far
+let l2Target     = [];   // target letters array
+let l2TileMap    = [];   // {letter, used, idx}
+let hintsUsed    = 0;
+
+/* ═══════════════════════════════════════════════════════════════
+   TTS — Google Cloud Text-to-Speech
+   Uses en-US-Neural2-F (natural female voice)
+   Returns base64 audio → plays via Audio element
+   Falls back to browser voice if API fails
+═══════════════════════════════════════════════════════════════ */
+const GOOGLE_TTS_KEY  = 'AIzaSyCWorJLNoWeUuTGLRHZStVOIeW134BM3ss';
+const GOOGLE_TTS_URL  = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_KEY}`;
+const audioBlobCache  = {};  // word → blob URL
+let   currentAudioEl  = null;
+
+async function speak(text) {
+  const key = text.toLowerCase();
+  if (currentAudioEl) { currentAudioEl.pause(); currentAudioEl.src = ''; currentAudioEl = null; }
+  setSpeakerPulse(true);
+
+  if (audioBlobCache[key] && audioBlobCache[key] !== 'loading') {
+    playBlobUrl(audioBlobCache[key]); return;
+  }
+  if (audioBlobCache[key] === 'loading') return;
+  audioBlobCache[key] = 'loading';
+
+  try {
+    const res = await fetch(GOOGLE_TTS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        input: { text },
+        voice: {
+          languageCode: 'en-US',
+          name: 'en-US-Neural2-F',   // natural female neural voice
+          ssmlGender: 'FEMALE'
+        },
+        audioConfig: {
+          audioEncoding: 'MP3',
+          speakingRate: 0.90,        // slightly slower for non-native listener
+          pitch: 0.0
+        }
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`Google TTS ${res.status}: ${err}`);
+    }
+
+    const data    = await res.json();
+    const binary  = atob(data.audioContent);
+    const bytes   = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob    = new Blob([bytes], { type: 'audio/mpeg' });
+    const url     = URL.createObjectURL(blob);
+    audioBlobCache[key] = url;
+    playBlobUrl(url);
+
+  } catch(err) {
+    console.warn('Google TTS failed, falling back:', err.message);
+    audioBlobCache[key] = null;
+    fallbackSpeak(text);
+  }
+}
+
+function playBlobUrl(url) {
+  const audio    = new Audio(url);
+  audio.onended  = () => setSpeakerPulse(false);
+  audio.onerror  = () => setSpeakerPulse(false);
+  currentAudioEl = audio;
+  audio.play().catch(err => { console.warn('Play blocked:', err.message); setSpeakerPulse(false); });
+}
+
+function fallbackSpeak(text) {
+  const synth = window.speechSynthesis;
+  if (!synth) { setSpeakerPulse(false); return; }
+  synth.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = 0.9; u.pitch = 1.0;
+  u.onend = () => setSpeakerPulse(false);
+  setTimeout(() => synth.speak(u), 50);
+}
+
+function setSpeakerPulse(on) {
+  const badge = document.querySelector('.speaker-badge');
+  if (!badge) return;
+  badge.style.background    = on ? 'var(--yellow)' : 'var(--blue)';
+  badge.style.transform     = on ? 'scale(1.2)'    : 'scale(1)';
+  badge.style.boxShadow     = on
+    ? '0 3px 14px rgba(255,209,102,0.6)'
+    : '0 3px 10px rgba(76,201,240,0.4)';
+}
+
+// Nothing to pre-warm — Audio element handles autoplay natively
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════════ */
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i=a.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+function burst(n=50) {
+  const wrap = document.getElementById('confetti');
+  wrap.innerHTML='';
+  const colors=['#FFD166','#EF476F','#4CC9F0','#06D6A0','#9B5DE5','#FF6B35'];
+  for(let i=0;i<n;i++){
+    const c=document.createElement('div');
+    c.className='cc';
+    c.style.cssText=`
+      left:${Math.random()*100}vw;top:-10px;
+      width:${8+Math.random()*8}px;height:${8+Math.random()*8}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-duration:${0.9+Math.random()*1.1}s;
+      animation-delay:${Math.random()*0.5}s;
+    `;
+    wrap.appendChild(c);
+  }
+  setTimeout(()=>wrap.innerHTML='',2500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SESSION FLOW
+═══════════════════════════════════════════════════════════════ */
+function switchLevel(n) {
+  currentLevel = n;
+  document.getElementById('tab-l1').classList.toggle('active', n===1);
+  document.getElementById('tab-l2').classList.toggle('active', n===2);
+
+  if (n===2) {
+    const qualified = WORD_BANK.filter(w => srsDB[w.word] && srsDB[w.word].level >= 1).length;
+    if (qualified < 6) {
+      showToast("Complete a Level 1 round first to unlock Level 2! 🔒");
+      currentLevel = 1;
+      document.getElementById('tab-l1').classList.add('active');
+      document.getElementById('tab-l2').classList.remove('active');
+      return;
+    }
+  }
+  startSession();
+}
+
+function startSession() {
+  sessionN++;
+  round = 0; score = 0; answered = false;
+  failedThisSession = [];
+  hintsUsed = 0;
+
+  // Build queue: getDueWords but if L2, only use words at level>=1
+  let pool;
+  if (currentLevel === 2) {
+    const eligible = WORD_BANK.filter(w => srsDB[w.word].level >= 1);
+    if (eligible.length < ROUNDS) {
+      pool = shuffle(eligible);
+      while(pool.length < ROUNDS) pool = [...pool, ...shuffle(eligible)];
+      pool = pool.slice(0, ROUNDS);
+    } else {
+      pool = getDueWords(ROUNDS);
+      pool = pool.filter(w => srsDB[w.word].level >= 1);
+      if (pool.length < ROUNDS) {
+        const extra = shuffle(eligible.filter(w => !pool.find(p=>p.word===w.word)));
+        pool = [...pool, ...extra].slice(0, ROUNDS);
+      }
+    }
+  } else {
+    pool = getDueWords(ROUNDS);
+  }
+
+  queue = pool.slice(0, ROUNDS);
+
+  // UI reset
+  document.getElementById('result-screen').classList.remove('show');
+  document.getElementById('game-card').style.display = 'flex';
+  document.getElementById('srs-bar').style.display = 'flex';
+
+  buildProgressDots();
+  updateSRSBar();
+  loadRound();
+}
+
+function buildProgressDots() {
+  const row = document.getElementById('progress-row');
+  row.innerHTML = '';
+  for(let i=0;i<ROUNDS;i++){
+    const d=document.createElement('div');
+    d.className='pdot'+(i===0?' current':'');
+    d.id=`pdot-${i}`;
+    row.appendChild(d);
+  }
+}
+
+function markDot(idx, ok) {
+  const d = document.getElementById(`pdot-${idx}`);
+  if(!d) return;
+  d.classList.remove('current');
+  d.classList.add(ok ? 'done-ok' : 'done-fail');
+  const next = document.getElementById(`pdot-${idx+1}`);
+  if(next) next.classList.add('current');
+}
+
+function updateSRSBar() {
+  const {newC,reviewC,masteredC} = getSRSCounts();
+  document.getElementById('cnt-new').textContent = newC;
+  document.getElementById('cnt-review').textContent = reviewC;
+  document.getElementById('cnt-mastered').textContent = masteredC;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ROUND LOAD
+═══════════════════════════════════════════════════════════════ */
+function loadRound() {
+  answered = false;
+  l2Answer = []; l2TileMap = []; l2Type = 0; l2BlankPositions = [];
+
+  const item = queue[round];
+  const card = srsDB[item.word];
+  const isReview = card.level >= 1;
+
+  // round label & badge
+  document.getElementById('round-label').textContent = `Round ${round+1} / ${ROUNDS}`;
+  const badge = document.getElementById('review-badge');
+  badge.classList.toggle('show', isReview);
+
+  // emoji
+  document.getElementById('word-emoji').textContent = item.emoji;
+
+  // hide word reveal, but show Hebrew immediately
+  const wr = document.getElementById('word-reveal');
+  const hl = document.getElementById('heb-label');
+  wr.className='word-reveal'; wr.innerHTML='';
+  hl.className='heb-label show';
+  hl.textContent = item.he;
+
+  // prompt — set in buildL1/buildL2
+  document.getElementById('prompt').innerHTML = '';
+
+  // feedback / next
+  const fb = document.getElementById('feedback');
+  fb.textContent=''; fb.className='feedback';
+  document.getElementById('next-btn').classList.remove('show');
+
+  // toggle sections
+  document.getElementById('l1-choices').style.display = currentLevel===1 ? 'grid' : 'none';
+  document.getElementById('l2-section').style.display = currentLevel===2 ? 'block' : 'none';
+
+  if (currentLevel===1) buildL1(item);
+  else buildL2(item);
+
+  // auto-speak
+  setTimeout(()=>speak(item.word), 350);
+}
+
+/* ─── PROMPT HELPER ────────────────────────────────────────── */
+function setPrompt(en, he) {
+  document.getElementById('prompt').innerHTML =
+    `${en}<span class="prompt-he">${he}</span>`;
+}
+
+/* ─── LEVEL 1 ──────────────────────────────────────────────── */
+function buildL1(item) {
+  setPrompt('Which letter does this word start with? 🤔', 'באיזו אות מתחילה המילה?');
+  const correct = item.word[0].toUpperCase();
+  const wrongs  = shuffle(ALPHA.filter(l=>l!==correct)).slice(0,3);
+  const opts    = shuffle([correct,...wrongs]);
+
+  const box = document.getElementById('l1-choices');
+  box.innerHTML = '';
+  opts.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className='ltr-btn';
+    btn.textContent=letter;
+    btn.onclick=()=>handleL1Answer(letter, btn, correct, item);
+    box.appendChild(btn);
+  });
+}
+
+function handleL1Answer(chosen, btn, correct, item) {
+  if(answered) return;
+  answered=true;
+  document.querySelectorAll('.ltr-btn').forEach(b=>b.disabled=true);
+
+  const ok = chosen===correct;
+  btn.classList.add(ok?'correct':'wrong');
+  if(!ok){
+    document.querySelectorAll('.ltr-btn').forEach(b=>{
+      if(b.textContent===correct) b.classList.add('show-correct');
+    });
+  }
+
+  resolveAnswer(ok, item);
+}
+
+/* ─── LEVEL 2 — MIXED QUESTION TYPES ──────────────────────────
+   Each round randomly picks one of 4 types:
+   Type 1: Fill in ONE missing letter (4 choices)
+   Type 2: Fill in FIRST + LAST letter (4 choices each)
+   Type 3: Order the FIRST 2 letters (tiles, no decoys)
+   Type 4: Full word scramble (correct letters only, no decoys)
+─────────────────────────────────────────────────────────────── */
+let l2Type = 0;  // current question type (1-4)
+let l2BlankPositions = []; // which positions are blank
+
+function buildL2(item) {
+  l2Target  = item.word.toUpperCase().split('');
+  l2Answer  = [];
+  l2TileMap = [];
+  hintsUsed = 0;
+  l2BlankPositions = [];
+
+  // Pick question type — weight easier ones higher early on
+  // Cycle through types so each session has variety
+  const types = [1, 2, 3, 4];
+  l2Type = types[round % 4] || shuffle(types)[0];
+
+  // Hide hint/clear by default, show only for tile types
+  document.getElementById('hint-btn').style.display = 'none';
+  document.getElementById('clear-btn').style.display = 'none';
+
+  if      (l2Type === 1) buildL2Type1(item);
+  else if (l2Type === 2) buildL2Type2(item);
+  else if (l2Type === 3) buildL2Type3(item);
+  else                   buildL2Type4(item);
+}
+
+// ── TYPE 1: One missing letter ─────────────────────────────────
+function buildL2Type1(item) {
+  setPrompt('Which letter is missing? 🔍', 'איזו אות חסרה?');
+
+  const blankPos = Math.floor(Math.random() * l2Target.length);
+  l2BlankPositions = [blankPos];
+  const correctLetter = l2Target[blankPos];
+
+  // Build word display directly into tile-pool (keeps it separate from choices)
+  const pool = document.getElementById('tile-pool');
+  pool.innerHTML = '';
+  const wordRow = document.createElement('div');
+  wordRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;margin-bottom:4px;';
+  l2Target.forEach((letter, i) => {
+    const isBlank = i === blankPos;
+    const box = document.createElement('div');
+    box.style.cssText = `
+      width:48px;height:54px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Fredoka One',cursive;font-size:1.6rem;font-weight:700;
+      ${isBlank
+        ? 'border:2.5px dashed var(--blue);background:var(--surface);color:var(--blue);'
+        : 'border:2px solid var(--border);background:var(--card);color:var(--text);'
+      }
+      transition:color .25s;
+    `;
+    box.textContent = isBlank ? '_' : letter;
+    if (isBlank) box.id = 'word-blank-0';
+    wordRow.appendChild(box);
+  });
+  pool.appendChild(wordRow);
+
+  // Choice buttons go in answer-slots
+  const slots = document.getElementById('answer-slots');
+  slots.innerHTML = '';
+  slots.style.justifyContent = 'center';
+
+  const wrongs = shuffle(ALPHA.filter(l => l !== correctLetter)).slice(0, 3);
+  const opts   = shuffle([correctLetter, ...wrongs]);
+  const choiceRow = document.createElement('div');
+  choiceRow.style.cssText = 'display:flex;gap:10px;flex-wrap:wrap;justify-content:center;width:100%;';
+  opts.forEach(letter => {
+    const btn = document.createElement('button');
+    btn.className = 'ltr-btn';
+    btn.textContent = letter;
+    btn.onclick = () => handleType1Answer(letter, btn, correctLetter, item);
+    choiceRow.appendChild(btn);
+  });
+  slots.appendChild(choiceRow);
+}
+
+function handleType1Answer(chosen, btn, correct, item) {
+  if (answered) return;
+  answered = true;
+  document.querySelectorAll('.ltr-btn').forEach(b => b.disabled = true);
+  const ok = chosen === correct;
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  if (!ok) document.querySelectorAll('.ltr-btn').forEach(b => { if (b.textContent === correct) b.classList.add('show-correct'); });
+  // Fill in the blank in the word display
+  const blankEl = document.getElementById('word-blank-0');
+  if (blankEl) { blankEl.textContent = correct; blankEl.style.color = ok ? 'var(--green)' : 'var(--coral)'; }
+  resolveAnswer(ok, item);
+}
+
+// ── TYPE 2: First + Last letter blanked, multiple choice ────────
+function buildL2Type2(item) {
+  setPrompt('Fill in the first and last letters! 🔤', 'מה האות הראשונה והאחרונה?');
+
+  const word = l2Target;
+  // For single-letter words just do first letter
+  const blanks = word.length > 1 ? [0, word.length - 1] : [0];
+  l2BlankPositions = blanks;
+  l2Answer = new Array(blanks.length).fill(null); // track answers per blank
+
+  renderWordWithBlanks(word, blanks);
+
+  // Build a sub-UI: two separate 4-choice rows, one per blank
+  const slots = document.getElementById('answer-slots');
+  slots.innerHTML = '';
+  slots.style.justifyContent = 'center';
+  document.getElementById('tile-pool').innerHTML = '';
+
+  blanks.forEach((blankPos, idx) => {
+    const correctLetter = word[blankPos];
+    const label = document.createElement('div');
+    label.style.cssText = 'width:100%;text-align:center;font-size:0.78rem;font-weight:800;color:var(--muted);margin-top:6px;';
+    label.textContent = idx === 0 ? 'First letter — האות הראשונה:' : 'Last letter — האות האחרונה:';
+    slots.appendChild(label);
+
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
+    const wrongs = shuffle(ALPHA.filter(l => l !== correctLetter)).slice(0, 3);
+    shuffle([correctLetter, ...wrongs]).forEach(letter => {
+      const btn = document.createElement('button');
+      btn.className = 'ltr-btn';
+      btn.style.fontSize = '1.5rem';
+      btn.textContent = letter;
+      btn.dataset.blankIdx = idx;
+      btn.dataset.blankPos = blankPos;
+      btn.dataset.correct  = correctLetter;
+      btn.onclick = () => handleType2Answer(letter, btn, correctLetter, idx, item);
+      row.appendChild(btn);
+    });
+    slots.appendChild(row);
+  });
+}
+
+function handleType2Answer(chosen, btn, correct, blankIdx, item) {
+  if (answered) return;
+  const ok = chosen === correct;
+  btn.classList.add(ok ? 'correct' : 'wrong');
+  // Disable this blank's row
+  document.querySelectorAll(`[data-blank-idx="${blankIdx}"]`).forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === b.textContent && !ok) b.classList.add('show-correct');
+  });
+  l2Answer[blankIdx] = ok;
+  // Fill blank in word display
+  const blankEl = document.getElementById(`word-blank-${blankIdx}`);
+  if (blankEl) { blankEl.textContent = correct; blankEl.style.color = ok ? 'var(--green)' : 'var(--coral)'; }
+
+  // Only resolve when all blanks answered
+  if (l2Answer.every(a => a !== null)) {
+    answered = true;
+    resolveAnswer(l2Answer.every(Boolean), item);
+  }
+}
+
+// ── TYPE 3: First 2 letters in order (tiles) ────────────────────
+function buildL2Type3(item) {
+  setPrompt('Tap the first 2 letters in order! ✌️', 'לחץ על שתי האותיות הראשונות בסדר הנכון');
+  document.getElementById('hint-btn').style.display = 'inline-block';
+  document.getElementById('clear-btn').style.display = 'inline-block';
+
+  const word = l2Target;
+  const numBlanks = Math.min(2, word.length);
+  l2BlankPositions = Array.from({length: numBlanks}, (_, i) => i);
+
+  // Build word display in tile-pool area (known letters + blank slots)
+  const pool = document.getElementById('tile-pool');
+  pool.innerHTML = '';
+  const wordRow = document.createElement('div');
+  wordRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;margin-bottom:8px;';
+  word.forEach((letter, i) => {
+    const isBlank = i < numBlanks;
+    const box = document.createElement('div');
+    box.style.cssText = `
+      width:48px;height:54px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Fredoka One',cursive;font-size:1.6rem;font-weight:700;
+      ${isBlank
+        ? 'border:2.5px dashed var(--border);background:var(--surface);color:var(--blue);'
+        : 'border:2px solid var(--border);background:var(--card);color:var(--text);'
+      }
+      transition:all .2s;
+    `;
+    box.textContent = isBlank ? '' : letter;
+    if (isBlank) box.id = `word-blank-${i}`;
+    wordRow.appendChild(box);
+  });
+  pool.appendChild(wordRow);
+
+  // Letter tiles in answer-slots
+  const correctLetters = word.slice(0, numBlanks);
+  const decoys = shuffle(ALPHA.filter(l => !correctLetters.includes(l))).slice(0, 2);
+  const allTiles = shuffle([...correctLetters, ...decoys]);
+  l2TileMap = allTiles.map((letter, i) => ({letter, used: false, idx: i}));
+
+  const slots = document.getElementById('answer-slots');
+  slots.innerHTML = '';
+  slots.style.justifyContent = 'center';
+  const tileRow = document.createElement('div');
+  tileRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:100%;';
+  l2TileMap.forEach((t, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.id = `tile-${i}`;
+    tile.textContent = t.letter;
+    tile.onclick = () => placeL3Tile(i, item);
+    tileRow.appendChild(tile);
+  });
+  slots.appendChild(tileRow);
+}
+
+function placeL3Tile(tileIdx, item) {
+  if (answered) return;
+  const t = l2TileMap[tileIdx];
+  if (t.used) return;
+  const pos = l2Answer.length;
+  if (pos >= l2BlankPositions.length) return;
+
+  t.used = true;
+  l2Answer.push({letter: t.letter, tileIdx});
+  document.getElementById(`tile-${tileIdx}`).classList.add('used');
+
+  const blankEl = document.getElementById(`word-blank-${pos}`);
+  if (blankEl) {
+    blankEl.textContent = t.letter;
+    blankEl.style.borderStyle = 'solid';
+    blankEl.style.borderColor = 'var(--blue)';
+    blankEl.style.background = 'rgba(76,201,240,0.10)';
+    blankEl.style.color = 'var(--text)';
+    blankEl.style.animation = 'slotIn .22s cubic-bezier(.34,1.56,.64,1)';
+  }
+
+  if (l2Answer.length === l2BlankPositions.length) {
+    setTimeout(() => checkTileAnswer(item), 250);
+  }
+}
+
+function checkTileAnswer(item) {
+  if (answered) return;
+  answered = true;
+  const ok = l2Answer.every((a, i) => a.letter === l2Target[l2BlankPositions[i]]);
+  l2BlankPositions.forEach((pos, i) => {
+    const blankEl = document.getElementById(`word-blank-${i}`);
+    if (blankEl) {
+      blankEl.textContent = l2Target[pos];
+      blankEl.style.color       = ok ? 'var(--green)' : 'var(--coral)';
+      blankEl.style.borderColor = ok ? 'var(--green)' : 'var(--coral)';
+      blankEl.style.background  = ok ? 'rgba(6,214,160,0.12)' : 'rgba(239,71,111,0.12)';
+    }
+  });
+  if (!ok) {
+    setTimeout(() => {
+      l2BlankPositions.forEach((pos, i) => {
+        const el = document.getElementById(`word-blank-${i}`);
+        if (el) {
+          el.textContent      = l2Target[pos];
+          el.style.color      = 'var(--green)';
+          el.style.borderColor = 'var(--green)';
+          el.style.background  = 'rgba(6,214,160,0.12)';
+        }
+      });
+    }, 700);
+  }
+  resolveAnswer(ok, item);
+}
+
+// ── TYPE 4: Full scramble — correct letters only ────────────────
+function buildL2Type4(item) {
+  setPrompt('Put the letters in the right order! 🔀', 'סדר את האותיות לכתיבת המילה');
+  document.getElementById('hint-btn').style.display = 'inline-block';
+  document.getElementById('clear-btn').style.display = 'inline-block';
+
+  l2BlankPositions = l2Target.map((_, i) => i);
+
+  // Build empty answer slots in answer-slots area
+  const slots = document.getElementById('answer-slots');
+  slots.innerHTML = '';
+  slots.style.justifyContent = 'center';
+  l2Target.forEach((_, i) => {
+    const box = document.createElement('div');
+    box.id = `word-blank-${i}`;
+    box.style.cssText = `
+      width:48px;height:54px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Fredoka One',cursive;font-size:1.6rem;font-weight:700;
+      border:2.5px dashed var(--border);background:var(--surface);color:var(--blue);
+      transition:all .2s;cursor:pointer;
+    `;
+    box.textContent = '';
+    box.onclick = () => removeLastIfPos(i);
+    slots.appendChild(box);
+  });
+
+  // Shuffled letter tiles below
+  const shuffledLetters = shuffle([...l2Target]);
+  l2TileMap = shuffledLetters.map((letter, i) => ({letter, used: false, idx: i}));
+
+  const pool = document.getElementById('tile-pool');
+  pool.innerHTML = '';
+  l2TileMap.forEach((t, i) => {
+    const tile = document.createElement('div');
+    tile.className = 'tile';
+    tile.id = `tile-${i}`;
+    tile.textContent = t.letter;
+    tile.onclick = () => placeL4Tile(i, item);
+    pool.appendChild(tile);
+  });
+}
+
+function removeLastIfPos(pos) {
+  // Allow tapping a filled slot to remove it if it's the last one
+  if (answered) return;
+  if (l2Answer.length === 0) return;
+  if (pos !== l2Answer.length - 1) return;
+  removeFromSlot(pos);
+}
+
+function placeL4Tile(tileIdx, item) {
+  if (answered) return;
+  const t = l2TileMap[tileIdx];
+  if (t.used) return;
+  const pos = l2Answer.length;
+  if (pos >= l2Target.length) return;
+
+  t.used = true;
+  l2Answer.push({letter: t.letter, tileIdx});
+  document.getElementById(`tile-${tileIdx}`).classList.add('used');
+
+  const blankEl = document.getElementById(`word-blank-${pos}`);
+  if (blankEl) {
+    blankEl.textContent = t.letter;
+    blankEl.style.borderStyle = 'solid';
+    blankEl.style.borderColor = 'var(--blue)';
+    blankEl.style.background = 'rgba(76,201,240,0.10)';
+    blankEl.style.color = 'var(--text)';
+    blankEl.style.animation = 'slotIn .22s cubic-bezier(.34,1.56,.64,1)';
+  }
+
+  if (l2Answer.length === l2Target.length) {
+    setTimeout(() => {
+      if (answered) return;
+      answered = true;
+      const ok = l2Answer.every((a, i) => a.letter === l2Target[i]);
+      l2Target.forEach((letter, i) => {
+        const el = document.getElementById(`word-blank-${i}`);
+        if (el) {
+          el.textContent = letter;
+          el.style.color = ok ? 'var(--green)' : 'var(--coral)';
+          el.style.borderColor = ok ? 'var(--green)' : 'var(--coral)';
+          el.style.background = ok ? 'rgba(6,214,160,0.12)' : 'rgba(239,71,111,0.12)';
+        }
+      });
+      if (!ok) {
+        setTimeout(() => {
+          l2Target.forEach((letter, i) => {
+            const el = document.getElementById(`word-blank-${i}`);
+            if (el) {
+              el.textContent = letter;
+              el.style.color = 'var(--green)';
+              el.style.borderColor = 'var(--green)';
+              el.style.background = 'rgba(6,214,160,0.12)';
+            }
+          });
+        }, 700);
+      }
+      resolveAnswer(ok, item);
+    }, 250);
+  }
+}
+
+// ── SHARED: render word with blanks ────────────────────────────
+function renderWordWithBlanks(word, blankPositions) {
+  const pool  = document.getElementById('tile-pool');
+  pool.innerHTML = '';
+
+  // Build the word display row inside answer-slots
+  const slots = document.getElementById('answer-slots');
+  slots.innerHTML = '';
+  slots.style.justifyContent = 'center';
+  slots.style.flexWrap = 'wrap';
+
+  const wordRow = document.createElement('div');
+  wordRow.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;justify-content:center;width:100%;margin-bottom:12px;';
+
+  let blankCount = 0;
+  word.forEach((letter, i) => {
+    const isBlank = blankPositions.includes(i);
+    const box = document.createElement('div');
+    box.style.cssText = `
+      width:48px;height:54px;border-radius:12px;
+      display:flex;align-items:center;justify-content:center;
+      font-family:'Fredoka One',cursive;font-size:1.6rem;font-weight:700;
+      ${isBlank
+        ? 'border:2.5px dashed var(--blue);background:var(--surface);color:var(--blue);'
+        : 'border:2px solid var(--border);background:var(--card);color:var(--text);'
+      }
+      transition:color .25s;
+    `;
+    if (isBlank) {
+      box.id = `word-blank-${blankCount++}`;
+      box.textContent = '_';
+    } else {
+      box.textContent = letter;
+    }
+    wordRow.appendChild(box);
+  });
+
+  slots.appendChild(wordRow);
+}
+
+// ── Shared tile helpers (used by Type 3 & 4 hint/clear) ─────────
+function placeTile(tileIdx) {
+  // Route to correct handler based on active type
+  if (l2Type === 3) placeL3Tile(tileIdx, queue[round]);
+  else if (l2Type === 4) placeL4Tile(tileIdx, queue[round]);
+}
+
+function removeFromSlot(pos) {
+  if (answered) return;
+  if (l2Type !== 3 && l2Type !== 4) return;
+  if (pos !== l2Answer.length - 1) return;
+
+  const last = l2Answer.pop();
+  l2TileMap[last.tileIdx].used = false;
+  document.getElementById(`tile-${last.tileIdx}`).classList.remove('used');
+
+  // For type 3, blank IDs match the word position; for type 4 they match answer index
+  const blankId = l2Type === 3 ? `word-blank-${l2BlankPositions[pos]}` : `word-blank-${pos}`;
+  const blankEl = document.getElementById(blankId);
+  if (blankEl) {
+    blankEl.textContent = '';
+    blankEl.style.borderStyle = 'dashed';
+    blankEl.style.borderColor = 'var(--border)';
+    blankEl.style.background = 'var(--surface)';
+    blankEl.style.color = 'var(--blue)';
+    blankEl.style.animation = '';
+  }
+}
+
+function clearSlots() {
+  if (answered) return;
+  while (l2Answer.length > 0) removeFromSlot(l2Answer.length - 1);
+}
+
+function useHint() {
+  if (answered) return;
+  const pos = l2Answer.length;
+  if (pos >= l2BlankPositions.length) return;
+  const correctLetter = l2Target[l2BlankPositions[pos]];
+  const tileEntry = l2TileMap.find(t => !t.used && t.letter === correctLetter);
+  if (!tileEntry) return;
+  hintsUsed++;
+  placeTile(tileEntry.idx);
+  if (hintsUsed >= 2) document.getElementById('hint-btn').style.opacity = '0.4';
+}
+
+// kept for compat — not used by new L2
+function checkL2() {}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESOLVE ANSWER (shared)
+═══════════════════════════════════════════════════════════════ */
+function resolveAnswer(ok, item) {
+  const fb = document.getElementById('feedback');
+
+  if(ok) {
+    onCorrect(item.word);
+    fb.textContent = pickPraise();
+    fb.className='feedback good';
+    burst(ok && score >= ROUNDS*0.7 ? 70 : 35);
+    speak(item.word);
+    score++;
+  } else {
+    onWrong(item.word);
+    // Schedule re-appearance: inject into queue 2–4 rounds later
+    if(!failedThisSession.includes(item.word)) {
+      failedThisSession.push(item.word);
+      const insertAt = Math.min(round + 2 + Math.floor(Math.random()*2), ROUNDS-1);
+      // Replace a future slot that isn't already a re-inserted word
+      for(let i=insertAt;i<ROUNDS;i++){
+        if(!failedThisSession.includes(queue[i]?.word) || i===ROUNDS-1) {
+          queue.splice(i, 0, item);   // insert
+          queue = queue.slice(0, ROUNDS); // keep at 10
+          break;
+        }
+      }
+    }
+    const correctHint = currentLevel===1 ? `The answer is  ${item.word[0].toUpperCase()} 👇` : `The word is ${item.word.toUpperCase()} 👇`;
+    fb.textContent=`Not quite! ${correctHint}`;
+    fb.className='feedback bad';
+    speak(item.word);
+  }
+
+  // Show word reveal
+  const wr = document.getElementById('word-reveal');
+  const first = item.word[0];
+  wr.innerHTML=`<span class="hl">${first.toUpperCase()}</span>${item.word.slice(1).toLowerCase()}`;
+  wr.classList.add('show');
+
+  const hl = document.getElementById('heb-label');
+  hl.textContent=item.he;
+  hl.classList.add('show');
+
+  markDot(round, ok);
+  updateSRSBar();
+
+  setTimeout(()=>document.getElementById('next-btn').classList.add('show'), 600);
+}
+
+function nextRound() {
+  round++;
+  if(round >= ROUNDS) {
+    showResult();
+  } else {
+    loadRound();
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESULT
+═══════════════════════════════════════════════════════════════ */
+function showResult() {
+  document.getElementById('game-card').style.display='none';
+  document.getElementById('srs-bar').style.display='none';
+
+  const rs = document.getElementById('result-screen');
+  rs.classList.add('show');
+
+  const pct = score/ROUNDS;
+  let trophy='🏆', title='Well done!';
+  if(pct===1)      { trophy='🌟'; title='Perfect!'; burst(100); }
+  else if(pct>=.7) { trophy='🏆'; title='Great job!'; burst(60); }
+  else if(pct>=.4) { trophy='👍'; title='Keep going!'; }
+  else             { trophy='💪'; title='Practice makes perfect!'; }
+
+  document.getElementById('res-trophy').textContent=trophy;
+  document.getElementById('res-title').textContent=title;
+  document.getElementById('res-score').innerHTML=`<span>${score} / ${ROUNDS}</span> correct this round`;
+
+  const {newC,reviewC,masteredC}=getSRSCounts();
+  const failed = failedThisSession.length;
+
+  // Check L2 unlock
+  const l2Eligible = WORD_BANK.filter(w=>srsDB[w.word].level>=1).length;
+  const l2Msg = currentLevel===1 && l2Eligible>=6
+    ? `<br>🔓 <b style="color:var(--blue)">Level 2 is now unlocked!</b> Try spelling words next!`
+    : '';
+
+  document.getElementById('srs-summary').innerHTML=`
+    <b>📊 Your Word Bank after this session:</b><br>
+    🔵 New words: <b>${newC}</b> &nbsp;|&nbsp;
+    🟡 In review: <b>${reviewC}</b> &nbsp;|&nbsp;
+    🟢 Mastered: <b>${masteredC}</b><br>
+    ${failed > 0 ? `🔄 <b>${failed}</b> tricky word${failed>1?'s':''} will come back for extra practice next session.` : '🎉 No mistakes — all words moving up!'}
+    ${l2Msg}
+  `;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════════ */
+function pickPraise() {
+  return shuffle(['🎉 Excellent!','⭐ Amazing!','🌟 Superstar!','🥳 Well done!',
+    '🎊 Fantastic!','👏 Perfect!','🚀 Awesome!','💪 Great job!','🔥 On fire!'])[0];
+}
+
+function showToast(msg) {
+  const existing = document.getElementById('toast-msg');
+  if (existing) existing.remove();
+
+  const t = document.createElement('div');
+  t.id = 'toast-msg';
+  t.style.cssText = `
+    position:fixed;top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    background:var(--card);border:2px solid var(--yellow);
+    color:var(--text);padding:20px 28px;border-radius:20px;
+    font-family:'Fredoka One',cursive;font-size:1.1rem;
+    text-align:center;z-index:9999;
+    box-shadow:0 8px 40px rgba(0,0,0,0.5);
+    max-width:280px;width:90%;
+    animation:popIn .3s cubic-bezier(.34,1.56,.64,1);
+  `;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EVENTS
+═══════════════════════════════════════════════════════════════ */
+document.getElementById('img-circle').addEventListener('click',()=>{
+  if(queue[round]) speak(queue[round].word);
+});
+
+/* ═══════════════════════════════════════════════════════════════
+   BOOT
+═══════════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════════════════
+   DEV TOOLS
+═══════════════════════════════════════════════════════════════ */
+function devUnlock() {
+  // Set all words to level 2 so both levels are unlocked
+  WORD_BANK.forEach(w => {
+    srsDB[w.word].level   = 2;
+    srsDB[w.word].nextDue = 0;
+  });
+  updateSRSBar();
+  // Style the button to confirm it worked
+  const btn = document.getElementById('dev-btn');
+  btn.textContent = '🛠 unlocked ✓';
+  btn.style.color      = 'var(--green)';
+  btn.style.borderColor = 'var(--green)';
+  showToast('🛠 Dev mode: all levels unlocked!');
+}
+
+initSRS();
+startSession();</script>
+
+</body>
+</html>
